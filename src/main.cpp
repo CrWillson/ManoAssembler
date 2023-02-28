@@ -7,12 +7,6 @@
 
 using namespace std;
 
-string toHex(int i) {
-    stringstream ss;
-    ss << hex << uppercase << i;
-    return ss.str().substr(4, 4);
-}
-
 int main(int argc, char** argv) {
     map<string, int> symbolTable;
     string inFileName = "test.asm";
@@ -24,10 +18,12 @@ int main(int argc, char** argv) {
         {"CIL", 0x7040}, {"INC", 0x7020}, {"SPA", 0x7010}, {"SNA", 0x7008},
         {"SZA", 0x7004}, {"SZE", 0x7002}, {"HLT", 0x7001}, {"INP", 0xF800},
         {"OUT", 0xF400}, {"SKI", 0xF200}, {"SKO", 0xF100}, {"ION", 0xF080}, 
-        {"IOF", 0xF040}
+        {"IOF", 0xF040}, {"ORG", 0xFFFF}, {"HEX", 0xFFFF}, {"DEC", 0xFFFF},
+        {"END", 0xFFFF}
     };
 
     int lineCounter = 0x000;
+    string line;
 
     ifstream inFile(inFileName);
     if (!inFile) {
@@ -35,17 +31,13 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    string line;
-    getline(inFile, line);
-    if (line.substr(5, 3) == "ORG") {
-        lineCounter = stoi(line.substr(9, 3), nullptr, 16);
-    }
-    else {
-        cerr << "Memory location not initialized" << endl;
+    // first pass to load the symbol table
+    ofstream outSym("test.sym");
+    if (!outSym) {
+        cerr << "Error opening output symbol file" << endl;
         return 2;
     }
 
-    ofstream outSym("test.sym");
     while(getline(inFile, line)) {
         string label = line.substr(0, 3);
         if (label != "   ") {
@@ -67,41 +59,53 @@ int main(int argc, char** argv) {
     inFile.open(inFileName);
 
     ofstream outBin("test.bin");
-    lineCounter = 0;
+    if (!outBin) {
+        cerr << "Error opening output bin file" << endl;
+        return 3;
+    }
 
+    lineCounter = 0;
     outBin << hex << uppercase;
     while(getline(inFile, line)) {
         string inst = line.substr(5, 3);
-        if (inst == "ORG") {
-            lineCounter = stoi(line.substr(9, 3), nullptr, 16);
-            continue;
-        }
-        else if (inst == "HEX") {
-            outBin << lineCounter << ": " << stoi(line.substr(9, 4), nullptr, 16) << endl;
-        }
-        else if (inst == "DEC") {
-            outBin << lineCounter << ": " << (short)stoi(line.substr(9, 4)) << endl;
-        }
-        else if (inst == "END") {
-            break;
-        }
 
+        // check if the instruction matches a known instruction
         auto instIter = instMap.find(inst);
         if (instIter != instMap.end()) {
             int opCode = instIter->second;
 
+            // get the operand from the symbol table
             if (opCode < 0x7000) {
                 string operand = line.substr(9, 3);
+
                 auto symIter = symbolTable.find(operand);
                 if (symIter != symbolTable.end()) {
                     opCode += symIter->second;
                 }
 
+                // check for indirect memory addressing
                 if (line.length() == 14 && line.at(13) == 'I') {
                     opCode += 0x8000;
                 }
             }
 
+            // special cases for pseudocodes
+            if (instIter->first == "ORG") {
+                lineCounter = stoi(line.substr(9, 3), nullptr, 16);
+                continue;
+            }
+            else if (instIter->first == "HEX") {
+                opCode = stoi(line.substr(9, 4), nullptr, 16);
+            }
+            else if (instIter->first == "DEC") {
+                outBin << lineCounter << ": " << (short)stoi(line.substr(9, 4)) << endl;
+                continue;
+            }
+            else if (instIter->first == "END") {
+                break;
+            }
+
+            // print to the bin file
             outBin << lineCounter << ": " << opCode << endl;
         }
 
