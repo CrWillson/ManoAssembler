@@ -8,6 +8,7 @@
 using namespace std;
 
 int main(int argc, char** argv) {
+    // initial system variables
     map<string, int> symbolTable;
     string inFileName = "test.asm";
 
@@ -58,6 +59,7 @@ int main(int argc, char** argv) {
     inFile.close();
     inFile.open(inFileName);
 
+    // second pass
     ofstream outBin("test.bin");
     if (!outBin) {
         cerr << "Error opening output bin file" << endl;
