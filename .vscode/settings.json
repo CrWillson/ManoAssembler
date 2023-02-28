@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "ios": "cpp",
+        "iomanip": "cpp",
+        "ostream": "cpp",
+        "string": "cpp",
+        "utility": "cpp"
+    }
+}
