@@ -24,6 +24,7 @@ int main(int argc, char** argv) {
     };
 
     int lineCounter = 0x000;
+    int realLineCounter = 1;
     string line;
 
     ifstream inFile(inFileName);
@@ -36,7 +37,7 @@ int main(int argc, char** argv) {
     ofstream outSym("test.sym");
     if (!outSym) {
         cerr << "Error opening output symbol file" << endl;
-        return 2;
+        return 1;
     }
 
     while(getline(inFile, line)) {
@@ -63,10 +64,11 @@ int main(int argc, char** argv) {
     ofstream outBin("test.bin");
     if (!outBin) {
         cerr << "Error opening output bin file" << endl;
-        return 3;
+        return 1;
     }
 
     lineCounter = 0;
+    realLineCounter = 1;
     outBin << hex << uppercase;
     while(getline(inFile, line)) {
         string inst = line.substr(5, 3);
@@ -78,11 +80,19 @@ int main(int argc, char** argv) {
 
             // get the operand from the symbol table
             if (opCode < 0x7000) {
+                if (line.length() < 12) {
+                    cerr << "Invalid or missing label at line " << realLineCounter << endl;
+                    return 1;
+                }
                 string operand = line.substr(9, 3);
 
                 auto symIter = symbolTable.find(operand);
                 if (symIter != symbolTable.end()) {
                     opCode += symIter->second;
+                }
+                else {
+                    cerr << "Undeclared label \"" << operand << "\" at line " << realLineCounter << endl;
+                    return 1;
                 }
 
                 // check for indirect memory addressing
@@ -94,6 +104,7 @@ int main(int argc, char** argv) {
             // special cases for pseudocodes
             if (instIter->first == "ORG") {
                 lineCounter = stoi(line.substr(9, 3), nullptr, 16);
+                realLineCounter++;
                 continue;
             }
             else if (instIter->first == "HEX") {
@@ -101,17 +112,24 @@ int main(int argc, char** argv) {
             }
             else if (instIter->first == "DEC") {
                 outBin << lineCounter << ": " << (short)stoi(line.substr(9, 4)) << endl;
+                realLineCounter++;
                 continue;
             }
             else if (instIter->first == "END") {
+                realLineCounter++;
                 break;
             }
 
             // print to the bin file
             outBin << lineCounter << ": " << opCode << endl;
         }
+        else {
+            cerr << "Unknown instruction \"" << inst << "\" at line " << realLineCounter << endl;
+            return 1;
+        }
 
         lineCounter++;
+        realLineCounter++;
     }
 
     inFile.close();
