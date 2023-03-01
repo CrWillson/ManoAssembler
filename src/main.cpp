@@ -9,10 +9,10 @@ using namespace std;
 
 int main(int argc, char** argv) {
     // initial system variables
-    map<string, int> symbolTable;
+    map<string, unsigned short> symbolTable;
     string inFileName = "test.asm";
 
-    map<string, int> instMap = {
+    map<string, unsigned short> instMap = {
         {"AND", 0x0000}, {"ADD", 0x1000}, {"LDA", 0x2000}, {"STA", 0x3000},
         {"BUN", 0x4000}, {"BSA", 0x5000}, {"ISZ", 0x6000}, {"CLA", 0x7800},
         {"CLE", 0x7400}, {"CMA", 0x7200}, {"CME", 0x7100}, {"CIR", 0x7080}, 
@@ -43,8 +43,14 @@ int main(int argc, char** argv) {
     while(getline(inFile, line)) {
         string label = line.substr(0, 3);
         if (label != "   ") {
-            symbolTable.insert(pair<string, int>(label, lineCounter));
-            outSym << label << ": " << hex << uppercase << lineCounter << endl;
+            if (symbolTable.find(label) == symbolTable.end()) {
+                symbolTable.insert(pair<string, int>(label, lineCounter));
+                outSym << label << ": " << hex << uppercase << lineCounter << endl;
+            }
+            else {
+                cerr << "Label \"" << label << "\" defined twice at line " << realLineCounter << endl;
+                return 1;
+            }
         }
         
         if (line.substr(5, 3) == "ORG") {
@@ -53,7 +59,7 @@ int main(int argc, char** argv) {
         else {
             lineCounter++;
         }
-
+        realLineCounter++;
     }
     outSym.close();
 
@@ -76,7 +82,7 @@ int main(int argc, char** argv) {
         // check if the instruction matches a known instruction
         auto instIter = instMap.find(inst);
         if (instIter != instMap.end()) {
-            int opCode = instIter->second;
+            unsigned short opCode = instIter->second;
 
             // get the operand from the symbol table
             if (opCode < 0x7000) {
@@ -111,12 +117,9 @@ int main(int argc, char** argv) {
                 opCode = stoi(line.substr(9, 4), nullptr, 16);
             }
             else if (instIter->first == "DEC") {
-                outBin << lineCounter << ": " << (short)stoi(line.substr(9, 4)) << endl;
-                realLineCounter++;
-                continue;
+                opCode = stoi(line.substr(9, 4));
             }
             else if (instIter->first == "END") {
-                realLineCounter++;
                 break;
             }
 
