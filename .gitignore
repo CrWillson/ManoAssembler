@@ -1,3 +1,7 @@
 src/main.exe
 src/test.bin
 src/test.sym
+asm.exe
+src/main.cpp
+src/program.sym
+src/program.bin

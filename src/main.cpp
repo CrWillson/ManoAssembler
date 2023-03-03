@@ -10,7 +10,9 @@ using namespace std;
 int main(int argc, char** argv) {
     // initial system variables
     map<string, unsigned short> symbolTable;
-    string inFileName = "test.asm";
+    string inFileName;
+    string outFileSym;
+    string outFileBin;
 
     map<string, unsigned short> instMap = {
         {"AND", 0x0000}, {"ADD", 0x1000}, {"LDA", 0x2000}, {"STA", 0x3000},
@@ -27,6 +29,16 @@ int main(int argc, char** argv) {
     int realLineCounter = 1;
     string line;
 
+    if (argc != 2) {
+        cerr << "Please specify assembly file name.";
+        return 1;
+    }
+    else {
+        inFileName = argv[1];
+        outFileSym = inFileName.substr(0, inFileName.find(".")) + ".sym";
+        outFileBin = inFileName.substr(0, inFileName.find(".")) + ".bin";
+    }
+
     ifstream inFile(inFileName);
     if (!inFile) {
         cerr << "Error opening input file." << endl;
@@ -34,7 +46,7 @@ int main(int argc, char** argv) {
     }
 
     // first pass to load the symbol table
-    ofstream outSym("test.sym");
+    ofstream outSym(outFileSym);
     if (!outSym) {
         cerr << "Error opening output symbol file" << endl;
         return 1;
@@ -67,7 +79,7 @@ int main(int argc, char** argv) {
     inFile.open(inFileName);
 
     // second pass
-    ofstream outBin("test.bin");
+    ofstream outBin(outFileBin);
     if (!outBin) {
         cerr << "Error opening output bin file" << endl;
         return 1;
