@@ -29,6 +29,7 @@ int main(int argc, char** argv) {
     int realLineCounter = 1;
     string line;
 
+    // get input file name
     if (argc != 2) {
         cerr << "Please specify assembly file name.";
         return 1;
