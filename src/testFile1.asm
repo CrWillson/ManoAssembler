@@ -1,10 +1,10 @@
      ORG 100
      LDA ADS
      STA PTR
-     LDA NBR
+     LDA NBR    /This is also a comment
      STA CTR
      CLA
-LOP, ADD PTR I
+LOP, ADD PTR I  /This is a comment
      ISZ PTR
      ISZ CTR
      BUN LOP
