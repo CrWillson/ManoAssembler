@@ -30,14 +30,25 @@ int main(int argc, char** argv) {
     string line;
 
     // get input file name
-    if (argc != 2) {
-        cerr << "Please specify assembly file name.";
+    if (argc < 2) {
+        cerr << "Usage: asm [\"input file\"] (-o \"output file name\")";
         return 1;
     }
+
+    inFileName = argv[1];
+    if (argc == 4) {
+        if (string(argv[2]) == "-o") {
+            outFileSym = string(argv[3]) + ".sym";
+            outFileBin = string(argv[3]) + ".bin";
+        }
+        else if (string(argv[2]) != "-o") {
+            cerr << "Unknown option " << argv[2] << " given.";
+            return 1;
+        }
+    }
     else {
-        inFileName = argv[1];
-        outFileSym = inFileName.substr(0, inFileName.find(".")) + ".sym";
-        outFileBin = inFileName.substr(0, inFileName.find(".")) + ".bin";
+        outFileSym = inFileName.substr(0, inFileName.rfind(".")) + ".sym";
+        outFileBin = inFileName.substr(0, inFileName.rfind(".")) + ".bin";
     }
 
     ifstream inFile(inFileName);
@@ -115,7 +126,7 @@ int main(int argc, char** argv) {
                 }
 
                 // check for indirect memory addressing
-                if (line.length() == 14 && line.at(13) == 'I') {
+                if (line.length() >= 14 && line.at(13) == 'I') {
                     opCode += 0x8000;
                 }
             }
