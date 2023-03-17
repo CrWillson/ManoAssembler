@@ -31,25 +31,14 @@ int main(int argc, char** argv) {
 
     // get input file name
     if (argc < 2) {
-        cerr << "Usage: asm [\"input file\"] (-o \"output file name\")";
+        cerr << "Usage: ./asm [path to file]";
         return 1;
     }
 
     inFileName = argv[1];
-    if (argc == 4) {
-        if (string(argv[2]) == "-o") {
-            outFileSym = string(argv[3]) + ".sym";
-            outFileBin = string(argv[3]) + ".bin";
-        }
-        else if (string(argv[2]) != "-o") {
-            cerr << "Unknown option " << argv[2] << " given.";
-            return 1;
-        }
-    }
-    else {
-        outFileSym = inFileName.substr(0, inFileName.rfind(".")) + ".sym";
-        outFileBin = inFileName.substr(0, inFileName.rfind(".")) + ".bin";
-    }
+    
+    outFileSym = inFileName.substr(0, inFileName.rfind(".")) + ".sym";
+    outFileBin = inFileName.substr(0, inFileName.rfind(".")) + ".bin";
 
     ifstream inFile(inFileName);
     if (!inFile) {
