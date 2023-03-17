@@ -5,6 +5,16 @@
 #include <sstream>
 #include <iomanip>
 
+/**
+ * Project: ManoAssembler
+ * Author:  Caleb Willson
+ * Date:    3/17/23
+ * 
+ * Takes an assembly file given by command line argument and assembles a
+ * .bin file containing binary code for the ManoMachine and a .sym file
+ * containing the symbol table.
+*/
+
 using namespace std;
 
 int main(int argc, char** argv) {
@@ -36,7 +46,6 @@ int main(int argc, char** argv) {
     }
 
     inFileName = argv[1];
-    
     outFileSym = inFileName.substr(0, inFileName.rfind(".")) + ".sym";
     outFileBin = inFileName.substr(0, inFileName.rfind(".")) + ".bin";
 
@@ -76,6 +85,7 @@ int main(int argc, char** argv) {
     }
     outSym.close();
 
+    // reset the input file
     inFile.close();
     inFile.open(inFileName);
 
@@ -105,6 +115,7 @@ int main(int argc, char** argv) {
                 }
                 string operand = line.substr(9, 3);
 
+                // find the label's corresponding memory location
                 auto symIter = symbolTable.find(operand);
                 if (symIter != symbolTable.end()) {
                     opCode += symIter->second;

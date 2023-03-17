@@ -14,7 +14,7 @@ The assembler can be used from the command line by running:
 ```
 ...\ManoAssembler> ./asm [path to file]
 ```
-In the case of this repository, compiling `testFile1.asm` in the tests folder would look like:
+In the case of this repository, compiling `tests/testFile1.asm` in the tests folder would look like:
 ```
 ...\ManoAssembler> ./asm tests/testFile1.asm
 ```
