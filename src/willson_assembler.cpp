@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include <chrono>
 
 /**
  * Project: ManoAssembler
@@ -38,6 +39,9 @@ int main(int argc, char** argv) {
     int lineCounter = 0x000;
     int realLineCounter = 1;
     string line;
+
+    // start execution timer
+    auto start = chrono::high_resolution_clock::now();
 
     // get input file name
     if (argc < 2) {
@@ -162,5 +166,12 @@ int main(int argc, char** argv) {
     inFile.close();
     outBin.close();
 
+    // stop execution timer and print results
+    auto end = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
+
+    cout << "Assembled \"" << inFileName << "\" using WillsonAssembler v1." << endl;
+    cout << "Execution time: " << duration.count() << " microseconds" << endl;
+    
     return 0;
 }
