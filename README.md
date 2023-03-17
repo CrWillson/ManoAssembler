@@ -6,16 +6,16 @@ Assembles assembly code into machine code for use on the Mano Microprocessor cre
 ## Compilation
 Using the g++ compliler, navigate to the top repository directory and run:
 ```
-...\ManoAssembler> g++ src/main.cpp -o asm.exe
+g++ src/willson_assembler.cpp -o asm.exe
 ```
 
 ## Usage
 The assembler can be used from the command line by running:
 ```
-...\ManoAssembler> ./asm [path to file]
+./asm [path to file]
 ```
 In the case of this repository, compiling `tests/testFile1.asm` in the tests folder would look like:
 ```
-...\ManoAssembler> ./asm tests/testFile1.asm
+./asm tests/testFile1.asm
 ```
 The output .bin and .sym files will be saved with the same name and stored in the same location as the input file.
