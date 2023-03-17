@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
             // get the operand from the symbol table
             if (opCode < 0x7000) {
                 if (line.length() < 12) {
-                    cerr << "Invalid or missing label at line " << realLineCounter << endl;
+                    cerr << "Invalid or missing operand at line " << realLineCounter << endl;
                     return 1;
                 }
                 string operand = line.substr(9, 3);
