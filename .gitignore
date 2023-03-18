@@ -5,3 +5,4 @@ asm.exe
 src/main.cpp
 src/program.sym
 src/program.bin
+src/willson_asm.exe
